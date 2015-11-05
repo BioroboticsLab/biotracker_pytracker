@@ -1,2 +1,2 @@
-# sample_py_tracker
+# Python Sample Tracker
 Example tracker in python for the BioTracker
