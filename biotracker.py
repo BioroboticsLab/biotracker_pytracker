@@ -1,9 +1,6 @@
 import zmq
 import numpy as np
 
-print("bio::start")
-print("bio::ready")
-
 socket = None
 
 
@@ -58,6 +55,36 @@ def run_client(track_fun, paint_fun):
         return ""
 
 
+def dtype_to_mtype(dtype, channels):
+    """
+    http://ninghang.blogspot.de/2012/11/list-of-mat-type-in-opencv.html
+    :param dtype:
+    :return:
+    """
+    mtype = -1
+    if dtype == np.uint8:
+        mtype = 0
+    elif dtype == np.int8:
+        mtype = 1
+    elif dtype == np.uint16:
+        mtype = 2
+    elif dtype == np.int16:
+        mtype = 3
+    elif dtype == np.int32:
+        mtype = 4
+    elif dtype == np.float32:
+        mtype = 5
+    elif dtype == np.float64:
+        mtype = 6
+    else:
+        raise Exception("dtype " + str(dtype) + " not supported")
+
+    if channels < 1 or channels > 4:
+        raise Exception("number of channels must be between 1 .. 4")
+
+    return mtype + ((channels - 1) * 8)
+
+
 def _reshape(mat_data, w, h, mtype):
     """
     M {MATRIX}
@@ -65,9 +92,6 @@ def _reshape(mat_data, w, h, mtype):
         h {height}
     mtype {matrix type}
     """
-    if mtype in [5, 6, 13, 14, 21, 22, 29, 30]:
-        raise Exception("We cannot use floating point matrices so far..")
-
     mod = mtype % 8
     dtype = np.int8
     if mod == 0:
@@ -80,6 +104,10 @@ def _reshape(mat_data, w, h, mtype):
         dtype = np.int16
     elif mod == 4:
         dtype = int
+    elif mod == 5:
+        dtype = np.float32
+    elif mod == 6:
+        dtype = np.float64
     else:
         raise Exception("Invalid integer type" + str(type))
 

@@ -1,6 +1,6 @@
 import zmq
 from enum import Enum
-import numpy as np
+import biotracker
 import time
 
 
@@ -29,6 +29,16 @@ def send_paint(frame):
 
 def send_track(frame, mat):
     socket = _start()
-    socket.send_string("hello")
+    w = str(mat.shape[0])
+    h = str(mat.shape[1])
+    try:
+        channels = mat.shape[2]
+    except:
+        channels = 1
+    mtype = str(
+        biotracker.dtype_to_mtype(mat.dtype, channels)
+    )
+    shape = w + "," + h + "," + mtype
+    socket.send_string(shape)
     print("track")
 
