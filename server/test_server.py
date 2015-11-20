@@ -1,12 +1,6 @@
 import zmq
-from enum import Enum
 import biotracker
 import time
-
-
-class MessageTypes(Enum):
-    track = 1
-    paint = 2
 
 
 def _start():
