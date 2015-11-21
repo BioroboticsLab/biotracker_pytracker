@@ -16,6 +16,7 @@ def send_str(m):
     socket = _start()
     socket.send_string(m)
 
+
 def send_paint(frame):
     socket = _start()
     print("paint")

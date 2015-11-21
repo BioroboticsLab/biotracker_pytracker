@@ -41,6 +41,7 @@ def rec_str():
 
 
 def recv_mat():
+    print("rec mat")
     mat_dim = socket.recv_string()
     shape = mat_dim.split(",")
     w = int(shape[0])
