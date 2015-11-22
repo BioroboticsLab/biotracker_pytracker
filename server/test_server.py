@@ -34,6 +34,7 @@ def send_track(frame, mat):
         biotracker.dtype_to_mtype(mat.dtype, channels)
     )
     shape = w + "," + h + "," + mtype
-    socket.send_string(shape)
-    print("track")
+    socket.send_string(shape, flags=zmq.SNDMORE)
+    socket.send(mat, track=False)
+    time.sleep(2)
 

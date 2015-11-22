@@ -41,13 +41,12 @@ def rec_str():
 
 
 def recv_mat():
-    print("rec mat")
     mat_dim = socket.recv_string()
     shape = mat_dim.split(",")
     w = int(shape[0])
     h = int(shape[1])
     mtype = int(shape[2])
-    mat_data = socket.recv()
+    mat_data = socket.recv(track=False)
     return _reshape(mat_data, w, h, mtype)
 
 

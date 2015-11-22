@@ -33,8 +33,8 @@ class Communication(unittest.TestCase):
         M = np.random.rand(800, 600)
 
         _thread.start_new(test_server.send_track, (1, M,))
-        #result = biotracker.rec_str()
 
         result = biotracker.recv_mat()
 
-        self.assertEqual("q", result)
+        self.assertEqual(M.shape[0], result.shape[0])
+        self.assertEqual(M.shape[1], result.shape[1])
