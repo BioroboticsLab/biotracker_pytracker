@@ -58,6 +58,7 @@ class Communication(unittest.TestCase):
 
         """
         send_frame = 10
+
         def track():
             pass
 
@@ -67,7 +68,6 @@ class Communication(unittest.TestCase):
 
         def shutdown():
             pass
-
 
         def keep_running():
             return False
@@ -80,9 +80,3 @@ class Communication(unittest.TestCase):
         except:
             self.assertTrue(True)
 
-
-    def test_paint(self):
-        """
-        Test if the biotracker.recv_paint function works correctly
-        """
-        self.assertEqual(2, 2)

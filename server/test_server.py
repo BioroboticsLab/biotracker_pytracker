@@ -19,7 +19,7 @@ def send_str(m):
 
 def send_complete_paint(frame):
     socket = _start()
-    socket.send_string("1")  # 1 is message type for paint
+    socket.send_string("1", flags=zmq.SNDMORE)  # 1 is message type for paint
     send_paint(frame, socket=socket)
 
 
