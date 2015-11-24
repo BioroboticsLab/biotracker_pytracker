@@ -85,8 +85,8 @@ def send_mat(M):
     """
     w = str(M.shape[0])
     h = str(M.shape[1])
-    c = M.shape[2]
-    mtype = str(dtype_to_mtype(M.dtype, c))
+    #c = M.shape[2]
+    mtype = str(cpp_type(M.dtype))
     shape = w + "," + h + "," + mtype
     socket.send_string(shape, flags=zmq.SNDMORE)
     socket.send(M)
@@ -115,12 +115,7 @@ def recv_mat():
     return frame, _reshape(mat_data, w, h, mtype)
 
 
-def dtype_to_mtype(dtype, channels):
-    """
-    http://ninghang.blogspot.de/2012/11/list-of-mat-type-in-opencv.html
-    :param dtype:
-    :return:
-    """
+def cpp_type(dtype):
     mtype = -1
     if dtype == np.uint8:
         mtype = 0
@@ -138,9 +133,20 @@ def dtype_to_mtype(dtype, channels):
         mtype = 6
     else:
         raise Exception("dtype " + str(dtype) + " not supported")
+    return mtype
+
+
+def dtype_to_mtype(dtype, channels):
+    """
+    http://ninghang.blogspot.de/2012/11/list-of-mat-type-in-opencv.html
+    :param dtype:
+    :return:
+    """
 
     if channels < 1 or channels > 4:
         raise Exception("number of channels must be between 1 .. 4")
+
+    mtype = cpp_type(dtype)
 
     return mtype + ((channels - 1) * 8)
 
