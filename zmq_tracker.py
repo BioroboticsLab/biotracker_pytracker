@@ -2,7 +2,7 @@ import biotracker
 
 
 def track(frame, M):
-    print("track " + str(frame))
+    print("track " + str(frame) + str(M.shape))
 
 
 def paint(frame):
