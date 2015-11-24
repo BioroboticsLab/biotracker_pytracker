@@ -1,6 +1,7 @@
 import unittest
 import numpy as np
 import _thread
+import time
 import sys
 sys.path.insert(0, '../')
 sys.path.insert(0, '../server')
@@ -62,9 +63,9 @@ class Communication(unittest.TestCase):
         def track():
             pass
 
-        def paint(f):
+        def paint(qpainter, f):
             self.assertEqual(f, send_frame)
-            raise Exception("success")
+            qpainter.drawRect((0, 1, 10, 5))
 
         def shutdown():
             pass
@@ -72,11 +73,10 @@ class Communication(unittest.TestCase):
         def keep_running():
             return False
 
-        _thread.start_new(test_server.send_complete_paint, (send_frame,))
+        result = dict()
+        _thread.start_new(test_server.send_complete_paint, (send_frame, result))
 
-        try:
-            biotracker.run_client(track, paint, shutdown, keep_running=keep_running)
-            self.assertTrue(False)
-        except:
-            self.assertTrue(True)
+        biotracker.run_client(track, paint, shutdown, keep_running=keep_running)
+        time.sleep(3)
+        self.assertEqual(result['qpainter'], "r(0,1,10,5)")
 

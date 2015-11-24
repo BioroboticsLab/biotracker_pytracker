@@ -30,10 +30,6 @@ class QPainter:
         self.content += "r(" + str(x) + "," + str(y) + "," + str(w) + "," + str(h) + ")"
 
 
-def send_painter(p):
-    socket.send_string(p.to_msg())
-
-
 def run_client(on_track, on_paint, on_shutdown, keep_running=None):
     """
 
@@ -56,6 +52,7 @@ def run_client(on_track, on_paint, on_shutdown, keep_running=None):
         start()
 
     is_running = True
+    qpainter = QPainter()
     while is_running:
         msg_type = socket.recv_string()
         if msg_type == "0":  # track
@@ -63,7 +60,15 @@ def run_client(on_track, on_paint, on_shutdown, keep_running=None):
             on_track(frame, M)
         elif msg_type == "1":  # paint
             frame = recv_paint()
-            on_paint(frame)
+            M = on_paint(qpainter, frame)
+            if M is None:
+                socket.send_string("N", flags=zmq.SNDMORE)
+                socket.send_string(qpainter.to_msg())
+            else:  # send matrix back
+                socket.send_string("Y", flags=zmq.SNDMORE)
+                socket.send_string(qpainter.to_msg(), flags=zmq.SNDMORE)
+                send_mat(M)
+            qpainter.content = ""
         elif msg_type == "2":  # shutdown
             on_shutdown()
         else:
@@ -72,6 +77,19 @@ def run_client(on_track, on_paint, on_shutdown, keep_running=None):
         if keep_running is not None:
             is_running = keep_running()
 
+
+def send_mat(M):
+    """
+
+    :param M: numpy
+    """
+    w = str(M.shape[0])
+    h = str(M.shape[1])
+    c = str(M.shape[2])
+    mtype = str(dtype_to_mtype(M.dtype, c))
+    shape = w + "," + h + "," + mtype
+    socket.send_string(shape, flags=zmq.SNDMORE)
+    socket.send(M)
 
 def recv_paint():
     """

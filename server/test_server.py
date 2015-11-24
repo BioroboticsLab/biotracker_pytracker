@@ -17,10 +17,20 @@ def send_str(m):
     socket.send_string(m)
 
 
-def send_complete_paint(frame):
+def send_complete_paint(frame, result):
     socket = _start()
     socket.send_string("1", flags=zmq.SNDMORE)  # 1 is message type for paint
     send_paint(frame, socket=socket)
+    time.sleep(1)
+
+    use_matrix = socket.recv_string()
+    qpainter = socket.recv_string()
+    result["qpainter"] = qpainter
+    if use_matrix == "Y":
+        shape = socket.recv_string()
+        _ = socket.recv()
+        result["M"] = shape
+    time.sleep(1)
 
 
 def send_paint(frame, socket=None):
