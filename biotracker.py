@@ -11,7 +11,6 @@ def start():
     socket.connect("tcp://localhost:5556")
 
 
-
 class QPainter:
     content = ""
 
@@ -35,6 +34,53 @@ def send_painter(p):
     socket.send_string(p.to_msg())
 
 
+def run_client(on_track, on_paint, on_shutdown, keep_running=None):
+    """
+
+    :param on_track:
+    :param on_paint:
+    :param on_shutdown:
+    :param keep_running:
+    """
+    if not hasattr(on_track, '__call__'):
+        raise Exception("on_track must be a function")
+    if not hasattr(on_paint, '__call__'):
+        raise Exception("on_paint must be a function")
+    if not hasattr(on_shutdown, '__call__'):
+        raise Exception("on_shutdown must be a function")
+    if keep_running is not None and not hasattr(keep_running, '__call__'):
+        raise Exception("keep_running must be a function")
+
+    global socket
+    if socket is None:
+        start()
+
+    is_running = True
+    while is_running:
+        msg_type = socket.recv_string()
+        if msg_type == "0":  # track
+            frame, M = recv_mat()
+            on_track(frame, M)
+        elif msg_type == "1":  # paint
+            frame = recv_paint()
+            on_paint(frame)
+        elif msg_type == "2":  # shutdown
+            on_shutdown()
+        else:
+            raise Exception("could not determine type:" + msg_type)
+
+        if keep_running is not None:
+            is_running = keep_running()
+
+
+def recv_paint():
+    """
+    :return: the paint event
+    """
+    frame = socket.recv_string()
+    return int(frame)
+
+
 def rec_str():
     m = socket.recv_string()
     return m
@@ -46,13 +92,9 @@ def recv_mat():
     w = int(shape[0])
     h = int(shape[1])
     mtype = int(shape[2])
+    frame = int(shape[3])
     mat_data = socket.recv(track=False)
-    return _reshape(mat_data, w, h, mtype)
-
-
-def run_client(track_fun, paint_fun):
-    if not hasattr(track_fun, '__call__'):
-        return ""
+    return frame, _reshape(mat_data, w, h, mtype)
 
 
 def dtype_to_mtype(dtype, channels):

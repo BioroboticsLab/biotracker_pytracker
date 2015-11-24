@@ -31,10 +31,58 @@ class Communication(unittest.TestCase):
         test the track loop
         """
         M = np.random.rand(800, 600)
-
-        _thread.start_new(test_server.send_track, (1, M,))
-
-        result = biotracker.recv_mat()
-
+        _thread.start_new(test_server.send_track, (8, M,))
+        frame, result = biotracker.recv_mat()
         self.assertEqual(M.shape[0], result.shape[0])
         self.assertEqual(M.shape[1], result.shape[1])
+        self.assertEqual(frame, 8)
+
+    def test_wrong_function_registration(self):
+        """
+        test that we can only register functions
+        """
+        def track():
+            pass
+
+        def paint():
+            pass
+        shutdown = "hello"
+        try:
+            biotracker.run_client(track, paint, shutdown)
+            self.assertTrue(False)
+        except:
+            self.assertTrue(True)
+
+    def test_full_paint_cycle(self):
+        """
+
+        """
+        send_frame = 10
+        def track():
+            pass
+
+        def paint(f):
+            self.assertEqual(f, send_frame)
+            raise Exception("success")
+
+        def shutdown():
+            pass
+
+
+        def keep_running():
+            return False
+
+        _thread.start_new(test_server.send_complete_paint, (send_frame,))
+
+        try:
+            biotracker.run_client(track, paint, shutdown, keep_running=keep_running)
+            self.assertTrue(False)
+        except:
+            self.assertTrue(True)
+
+
+    def test_paint(self):
+        """
+        Test if the biotracker.recv_paint function works correctly
+        """
+        self.assertEqual(2, 2)

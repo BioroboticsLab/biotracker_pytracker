@@ -17,12 +17,25 @@ def send_str(m):
     socket.send_string(m)
 
 
-def send_paint(frame):
+def send_complete_paint(frame):
     socket = _start()
-    print("paint")
+    socket.send_string("1")  # 1 is message type for paint
+    send_paint(frame, socket=socket)
+
+
+def send_paint(frame, socket=None):
+    """
+    only send payload
+    """
+    if socket is None:
+        socket = _start()
+    socket.send_string(str(frame))
 
 
 def send_track(frame, mat):
+    """
+    only send payload
+    """
     socket = _start()
     w = str(mat.shape[0])
     h = str(mat.shape[1])
@@ -33,7 +46,7 @@ def send_track(frame, mat):
     mtype = str(
         biotracker.dtype_to_mtype(mat.dtype, channels)
     )
-    shape = w + "," + h + "," + mtype
+    shape = w + "," + h + "," + mtype + "," + str(frame)
     socket.send_string(shape, flags=zmq.SNDMORE)
     socket.send(mat, track=False)
     time.sleep(2)
