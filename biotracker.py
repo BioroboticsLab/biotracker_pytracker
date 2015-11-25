@@ -64,10 +64,10 @@ def run_client(on_track, on_paint, on_shutdown, keep_running=None):
             if M is None:
                 socket.send_string("N", flags=zmq.SNDMORE)
                 socket.send_string(qpainter.to_msg())
-            #else:  # send matrix back
-                #socket.send_string("Y", flags=zmq.SNDMORE)
-                #socket.send_string(qpainter.to_msg(), flags=zmq.SNDMORE)
-                #send_mat(M)
+            else:  # send matrix back
+                socket.send_string("Y", flags=zmq.SNDMORE)
+                socket.send_string(qpainter.to_msg(), flags=zmq.SNDMORE)
+                send_mat(M)
             qpainter.content = ""
         elif msg_type == "2":  # shutdown
             on_shutdown()
