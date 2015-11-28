@@ -24,7 +24,13 @@ def send_complete_paint(frame, result):
     time.sleep(1)
 
     use_matrix = socket.recv_string()
+
+    socket.send_string("3")
+
     qpainter = socket.recv_string()
+
+    time.sleep(1)
+
     result["qpainter"] = qpainter
     if use_matrix == "Y":
         shape = socket.recv_string()

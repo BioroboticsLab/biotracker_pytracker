@@ -30,16 +30,19 @@ class QPainter:
         self.content += "r(" + str(x) + "," + str(y) + "," + str(w) + "," + str(h) + ")"
 
 
-def run_client(on_track, on_paint, on_shutdown, keep_running=None):
+def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=None):
     """
 
     :param on_track:
     :param on_paint:
+    :param on_paintOverlay:
     :param on_shutdown:
     :param keep_running:
     """
     if not hasattr(on_track, '__call__'):
         raise Exception("on_track must be a function")
+    if not hasattr(on_paintOverlay, '__call__'):
+        raise Exception("on_paintOverlay must be a function")
     if not hasattr(on_paint, '__call__'):
         raise Exception("on_paint must be a function")
     if not hasattr(on_shutdown, '__call__'):
@@ -60,22 +63,23 @@ def run_client(on_track, on_paint, on_shutdown, keep_running=None):
             on_track(frame, M)
         elif msg_type == "1":  # paint
             frame = recv_paint()
-            M = on_paint(qpainter, frame)
+            M = on_paint(frame)
             if M is None:
-                socket.send_string("N", flags=zmq.SNDMORE)
-                socket.send_string(qpainter.to_msg())
+                socket.send_string("N")
             else:  # send matrix back
                 socket.send_string("Y", flags=zmq.SNDMORE)
-                socket.send_string(qpainter.to_msg(), flags=zmq.SNDMORE)
                 send_mat(M)
-            qpainter.content = ""
         elif msg_type == "2":  # shutdown
             on_shutdown()
+        elif msg_type == "3":  # paintOverlay
+            on_paintOverlay(qpainter)
+            socket.send_string(qpainter.to_msg())
+            qpainter.content = ""
         else:
             raise Exception("could not determine type:" + msg_type)
 
         if keep_running is not None:
-            is_running = keep_running()
+            is_running = keep_running(msg_type)
 
 
 def send_mat(M):
@@ -90,6 +94,7 @@ def send_mat(M):
     shape = w + "," + h + "," + mtype
     socket.send_string(shape, flags=zmq.SNDMORE)
     socket.send(M)
+
 
 def recv_paint():
     """
