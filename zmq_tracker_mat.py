@@ -13,14 +13,17 @@ def track(frame, M):
 def paint(qpainter, frame):
     global Mat
     print("paint " + str(frame))
-    qpainter.setPen((255, 255, 0, 255))
-    qpainter.drawRect((20, 20, 60, 60))
     if Mat is not None:
         return Mat
 
+
+def paint_overlay(qpainter):
+    print("paint overlay")
+    qpainter.setPen((255, 255, 0, 255))
+    qpainter.drawRect((20, 20, 60, 60))
 
 
 def shutdown():
     print("shutdown")
 
-biotracker.run_client(track, paint, shutdown)
+biotracker.run_client(track, paint, paint_overlay, shutdown)
