@@ -10,7 +10,7 @@ def track(frame, M):
     print("track " + str(frame) + str(Mat.shape))
 
 
-def paint(qpainter, frame):
+def paint(frame):
     global Mat
     print("paint " + str(frame))
     if Mat is not None:
