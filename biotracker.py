@@ -17,14 +17,15 @@ class QPainter:
     def to_msg(self):
         return self.content
 
-    def setPen(self, col):
-        (r, g, b, a) = col
+    def setPen(self, r=0, g=0, b=0, a=255):
+        #(r, g, b, a) = col
         if len(self.content) > 0:
             self.content += ";"
         self.content += "p(" + str(r) + "," + str(g) + "," + str(b) + ',' + str(a) + ")"
 
     def drawRect(self, rec):
         (x, y, w, h) = rec
+        print("draw rect:" + str(rec))
         if len(self.content) > 0:
             self.content += ";"
         self.content += "r(" + str(x) + "," + str(y) + "," + str(w) + "," + str(h) + ")"
