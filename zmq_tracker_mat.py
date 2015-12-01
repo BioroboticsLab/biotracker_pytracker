@@ -19,7 +19,7 @@ def paint(frame):
 
 def paint_overlay(qpainter):
     print("paint overlay")
-    qpainter.setPen((255, 255, 0, 255))
+    qpainter.setPen(255, 255, 0, 255)
     qpainter.drawRect((20, 20, 60, 60))
 
 
