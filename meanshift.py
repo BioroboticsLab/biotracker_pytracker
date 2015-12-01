@@ -34,7 +34,7 @@ def paint(frame):
 
 def paint_overlay(qpainter):
     global track_window
-    qpainter.setPen((255, 0, 0))
+    qpainter.setPen(255, 0, 0)
     x = track_window[1]
     y = track_window[0]
     w = track_window[2]
