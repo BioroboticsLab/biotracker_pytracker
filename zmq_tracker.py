@@ -13,7 +13,7 @@ def track(frame, M):
 def paint(qpainter, frame):
     global Mat
     print("paint " + str(frame))
-    qpainter.setPen((255, 255, 0, 255))
+    qpainter.setPen(255, 255, 0, 255)
     qpainter.drawRect((20, 20, 60, 60))
 
 
