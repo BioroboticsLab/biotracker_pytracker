@@ -1,6 +1,7 @@
 import unittest
 import biotracker
 
+
 class QPainterTest(unittest.TestCase):
     """
     Unit tests for QPainter (py)

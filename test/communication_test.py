@@ -58,6 +58,12 @@ class Communication(unittest.TestCase):
         except:
             self.assertTrue(True)
 
+
+    def test_button_callback(self):
+        """
+        Mimics the button callback
+        """
+
     def test_full_paint_cycle(self):
         """
 

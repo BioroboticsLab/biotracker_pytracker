@@ -31,6 +31,73 @@ class QPainter:
         self.content += "r(" + str(x) + "," + str(y) + "," + str(w) + "," + str(h) + ")"
 
 
+def id_generator():
+    """
+    generates a unique id for the widgets
+    :return: {id}
+    """
+    i = 0
+    while True:
+        i += 1
+        yield i
+
+id_gen = id_generator()
+
+
+class Widget:
+    """
+
+    """
+    id = -1
+
+    def __init__(self):
+        self.id = next(id_gen)
+
+    def to_msg(self):
+        raise Exception("Not implemented")
+
+
+class Divider(Widget):
+    def to_msg(self):
+        return "d()"
+
+
+class Text(Widget):
+    text = ""
+    type = "t"
+
+    def __init__(self, text):
+        super().__init__()
+        self.text = text
+
+    def to_msg(self):
+        return self.type + "(" + str(self.id) + "," + str(self.text) + ")"
+
+
+class Button(Text):
+    callback = None,
+
+    def __init__(self, text, callback):
+        super().__init__(text)
+        self.callback = callback
+        self.type = "b"
+
+
+class Slider(Widget):
+    text = ""
+    callback = None
+    min = 0
+    max = 255
+    default = 100
+
+    def __init__(self, text, minv, maxv, default, callback):
+        self.text = text
+        self.callback = callback
+        self.min = minv
+        self.max = maxv
+        self.default = default
+
+
 def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=None):
     """
 
