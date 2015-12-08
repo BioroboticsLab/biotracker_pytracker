@@ -90,6 +90,36 @@ class Communication(unittest.TestCase):
         btnTxt = widgetsStr[0].split(",")[1]
         self.assertEqual(btnTxt, "Click)")
 
+    def test_click_button_widget(self):
+        """
+        request widgets + click
+        """
+        counter = 0
+        def button_click():
+            nonlocal counter
+            counter += 1
+
+        track = lambda _: None
+        paint = lambda _: None
+        paintOverlay = lambda _: None
+        shutdown = lambda _: None
+        keep_running = lambda t: t != "5"
+
+        def request_widgets():
+            return[biotracker.Button("ClickMe", button_click)]
+
+        _thread.start_new(test_server.widget_request_with_click, ())
+        biotracker.run_client(
+            track,
+            paint,
+            paintOverlay,
+            shutdown,
+            keep_running=keep_running,
+            request_widgets=request_widgets
+        )
+        time.sleep(4)
+        self.assertEqual(counter, 1)
+
     def test_button_callback(self):
         """
         Mimics the button callback

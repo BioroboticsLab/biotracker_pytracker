@@ -47,6 +47,16 @@ def send_widget_request(result):
     time.sleep(1)
 
 
+def widget_request_with_click():
+    socket = _start()
+    socket.send_string("4")
+    button = socket.recv_string()
+    id = button.split(',')[0][2:]
+    socket.send_string("5", flags=zmq.SNDMORE)
+    socket.send_string("0," + id + "")
+    time.sleep(1)
+
+
 def send_paint(frame, socket=None):
     """
     only send payload

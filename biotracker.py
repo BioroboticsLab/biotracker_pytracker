@@ -126,6 +126,7 @@ def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=No
     if socket is None:
         start()
 
+    event_cache = dict()
     is_running = True
     qpainter = QPainter()
     while is_running:
@@ -149,15 +150,32 @@ def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=No
             socket.send_string(qpainter.to_msg())
             qpainter.content = ""
         elif msg_type == "4":  # request widgets
-            widgetStr = ''
+            widget_str = ''
             if request_widgets is not None:
                 widget_list = request_widgets()
                 for widget in widget_list:
-                    if len(widgetStr) > 0:
-                        widgetStr += ";"
-                    widgetStr += widget.to_msg()
-            socket.send_string(widgetStr)
+                    key = str(widget.id)
+                    if key in event_cache:
+                        raise Exception("duplicate key:" + key)
+                    if hasattr(widget, 'callback'):
+                        event_cache[key] = widget.callback
+                    if len(widget_str) > 0:
+                        widget_str += ";"
+                    widget_str += widget.to_msg()
+            socket.send_string(widget_str)
         elif msg_type == "5":  # update widget
+            events = socket.recv_string().split(',')
+            event_type = events[0]
+            widget_id = events[1]
+            if widget_id in event_cache:
+                if event_type == "0":  # click event
+                    event_cache[widget_id]()
+                elif event_type == "1":  # value changed
+                    event_cache[widget_id](int(events[2]))
+                else:
+                    raise Exception("Unknown event type " + event_type)
+            else:
+                raise Exception("cannot find callback for widget id " + widget_id)
             pass
         else:
             raise Exception("could not determine type:" + msg_type)
