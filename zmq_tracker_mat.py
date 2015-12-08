@@ -32,7 +32,13 @@ def btn_click():
 
 
 def request_widgets():
+    print("request widgets")
     return [biotracker.Button("ClickMe", btn_click)]
 
 
-biotracker.run_client(track, paint, paint_overlay, shutdown)
+biotracker.run_client(
+    track,
+    paint,
+    paint_overlay,
+    shutdown,
+    request_widgets=request_widgets )
