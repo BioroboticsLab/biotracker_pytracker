@@ -99,7 +99,7 @@ class Slider(Widget):
         self.default = default
 
 
-def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=None, request_widgets=lambda _: ""):
+def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=None, request_widgets=None):
     """
 
     :param on_track:
@@ -122,11 +122,24 @@ def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=No
     if request_widgets is not None and not hasattr(request_widgets, '__call__'):
         raise Exception("request_widgets must be a function")
 
+    event_cache = dict()
+    widget_str = ''
+    if request_widgets is not None:
+        widget_list = request_widgets()
+        for widget in widget_list:
+            key = str(widget.id)
+            if key in event_cache:
+                raise Exception("duplicate key:" + key)
+            if hasattr(widget, 'callback'):
+                event_cache[key] = widget.callback
+            if len(widget_str) > 0:
+                widget_str += ";"
+            widget_str += widget.to_msg()
+
     global socket
     if socket is None:
         start()
 
-    event_cache = dict()
     is_running = True
     qpainter = QPainter()
     while is_running:
@@ -150,18 +163,6 @@ def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=No
             socket.send_string(qpainter.to_msg())
             qpainter.content = ""
         elif msg_type == "4":  # request widgets
-            widget_str = ''
-            if request_widgets is not None:
-                widget_list = request_widgets()
-                for widget in widget_list:
-                    key = str(widget.id)
-                    if key in event_cache:
-                        raise Exception("duplicate key:" + key)
-                    if hasattr(widget, 'callback'):
-                        event_cache[key] = widget.callback
-                    if len(widget_str) > 0:
-                        widget_str += ";"
-                    widget_str += widget.to_msg()
             socket.send_string(widget_str)
         elif msg_type == "5":  # update widget
             events = socket.recv_string().split(',')

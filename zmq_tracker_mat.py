@@ -26,4 +26,13 @@ def paint_overlay(qpainter):
 def shutdown():
     print("shutdown")
 
+
+def btn_click():
+    print("button click")
+
+
+def request_widgets():
+    return [biotracker.Button("ClickMe", btn_click)]
+
+
 biotracker.run_client(track, paint, paint_overlay, shutdown)
