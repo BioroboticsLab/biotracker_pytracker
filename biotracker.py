@@ -153,6 +153,8 @@ def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=No
             if request_widgets is not None:
                 widget_list = request_widgets()
                 for widget in widget_list:
+                    if len(widgetStr) > 0:
+                        widgetStr += ";"
                     widgetStr += widget.to_msg()
             socket.send_string(widgetStr)
         elif msg_type == "5":  # update widget

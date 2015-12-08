@@ -84,8 +84,11 @@ class Communication(unittest.TestCase):
             keep_running=keep_running,
             request_widgets=request_widgets)
         time.sleep(5)
-        print(result)
-        #self.assertEqual(result['widgets'], "")
+        widgetsStr = result['widgets'].split(';')
+        self.assertEqual(len(widgetsStr), 2)
+        self.assertEqual(widgetsStr[1], "d()")
+        btnTxt = widgetsStr[0].split(",")[1]
+        self.assertEqual(btnTxt, "Click)")
 
     def test_button_callback(self):
         """
