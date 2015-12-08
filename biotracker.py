@@ -91,6 +91,7 @@ class Slider(Widget):
     default = 100
 
     def __init__(self, text, minv, maxv, default, callback):
+        super().__init__()
         self.text = text
         self.callback = callback
         self.min = minv
@@ -98,7 +99,7 @@ class Slider(Widget):
         self.default = default
 
 
-def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=None):
+def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=None, request_widgets=lambda _: ""):
     """
 
     :param on_track:
@@ -106,6 +107,7 @@ def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=No
     :param on_paintOverlay:
     :param on_shutdown:
     :param keep_running:
+    :param request_widgets:
     """
     if not hasattr(on_track, '__call__'):
         raise Exception("on_track must be a function")
@@ -117,6 +119,8 @@ def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=No
         raise Exception("on_shutdown must be a function")
     if keep_running is not None and not hasattr(keep_running, '__call__'):
         raise Exception("keep_running must be a function")
+    if request_widgets is not None and not hasattr(request_widgets, '__call__'):
+        raise Exception("request_widgets must be a function")
 
     global socket
     if socket is None:
@@ -139,10 +143,20 @@ def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=No
                 send_mat(M)
         elif msg_type == "2":  # shutdown
             on_shutdown()
+            is_running = False
         elif msg_type == "3":  # paintOverlay
             on_paintOverlay(qpainter)
             socket.send_string(qpainter.to_msg())
             qpainter.content = ""
+        elif msg_type == "4":  # request widgets
+            widgetStr = ''
+            if request_widgets is not None:
+                widget_list = request_widgets()
+                for widget in widget_list:
+                    widgetStr += widget.to_msg()
+            socket.send_string(widgetStr)
+        elif msg_type == "5":  # update widget
+            pass
         else:
             raise Exception("could not determine type:" + msg_type)
 

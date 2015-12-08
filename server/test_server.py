@@ -39,6 +39,14 @@ def send_complete_paint(frame, result):
     time.sleep(1)
 
 
+def send_widget_request(result):
+    socket = _start()
+    socket.send_string("4")
+    time.sleep(1)
+    result['widgets'] = socket.recv_string()
+    time.sleep(1)
+
+
 def send_paint(frame, socket=None):
     """
     only send payload

@@ -58,11 +58,40 @@ class Communication(unittest.TestCase):
         except:
             self.assertTrue(True)
 
+    def test_request_widgets(self):
+        """
+        make sure that the widgets reach the server
+        """
+        track = lambda _: None
+        paint = lambda _: None
+        paintOverlay = lambda _: None
+        shutdown = lambda _: None
+        keep_running = lambda t: t != "4"
+
+        def request_widgets():
+            widgets = []
+            widgets.append(biotracker.Button('Click', lambda _: None))
+            widgets.append(biotracker.Divider())
+            return widgets
+
+        result = dict()
+        _thread.start_new(test_server.send_widget_request, (result,))
+        biotracker.run_client(
+            track,
+            paint,
+            paintOverlay,
+            shutdown,
+            keep_running=keep_running,
+            request_widgets=request_widgets)
+        time.sleep(5)
+        print(result)
+        #self.assertEqual(result['widgets'], "")
 
     def test_button_callback(self):
         """
         Mimics the button callback
         """
+        pass
 
     def test_full_paint_cycle(self):
         """
