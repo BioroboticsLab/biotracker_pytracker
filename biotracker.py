@@ -25,7 +25,6 @@ class QPainter:
 
     def drawRect(self, rec):
         (x, y, w, h) = rec
-        print("draw rect:" + str(rec))
         if len(self.content) > 0:
             self.content += ";"
         self.content += "r(" + str(x) + "," + str(y) + "," + str(w) + "," + str(h) + ")"
@@ -219,7 +218,7 @@ def recv_mat():
     h = int(shape[1])
     mtype = int(shape[2])
     frame = int(shape[3])
-    mat_data = socket.recv(track=False)
+    mat_data = socket.recv(copy=True, track=False)
     return frame, _reshape(mat_data, w, h, mtype)
 
 
@@ -299,5 +298,7 @@ def _reshape(mat_data, w, h, mtype):
         raise Exception("Wrong number of channels:" + str(channels))
 
     buf = memoryview(mat_data)
+    if len(buf) == 1:
+        return None
     M = np.frombuffer(buf, dtype=dtype)
     return np.reshape(M, (w, h, channels))

@@ -30,10 +30,15 @@ def shutdown():
 def btn_click():
     print("button click")
 
+def btn2_click():
+    print("button2 click")
 
 def request_widgets():
-    print("request widgets")
-    return [biotracker.Button("ClickMe", btn_click)]
+    print("request widgets btn")
+    return [
+        biotracker.Button("ClickMe", btn_click),
+        biotracker.Button("ClickMeToo", btn2_click)
+    ]
 
 
 biotracker.run_client(
