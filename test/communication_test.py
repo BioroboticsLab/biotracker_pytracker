@@ -120,11 +120,11 @@ class Communication(unittest.TestCase):
         time.sleep(4)
         self.assertEqual(counter, 1)
 
-    def test_button_callback(self):
+    #def test_button_callback(self):
         """
         Mimics the button callback
         """
-        pass
+    #    pass
 
     def test_full_paint_cycle(self):
         """

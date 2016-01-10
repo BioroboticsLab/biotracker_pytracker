@@ -97,6 +97,58 @@ class Slider(Widget):
         self.max = maxv
         self.default = default
 
+MSG_TYPE_NOTIFICATION = "0"
+MSG_TYPE_WARNING = "1"
+MSG_TYPE_FAIL = "2"
+MSG_TYPE_FILE_OPEN = "3"
+
+
+class Signals:
+    """
+    represents the signals that a Tracker can send to the BioTracker GUI
+    The signals are batched and send at the end of a call
+    """
+
+    @staticmethod
+    def notify_gui(message, type=MSG_TYPE_NOTIFICATION):
+        global socket
+        message = message.replace(",", "%2C").replace(";", "%3B")
+        socket.send_string("0," + message + "," + type)
+
+    @staticmethod
+    def update():
+        global socket
+        socket.send_string("1")
+
+    @staticmethod
+    def force_tracking():
+        global socket
+        socket.send_string("2")
+
+    @staticmethod
+    def jump_to_frame(frame_number):
+        global socket
+        socket.send_string("3," + str(int(frame_number)))
+
+    @staticmethod
+    def pause_playback(paused):
+        global socket
+        data = "4,"
+        if paused:
+            data += "1"
+        else:
+            data += "0"
+        socket.send_string(data)
+
+    @staticmethod
+    def stop_listening():
+        global socket
+        socket.send_string("99")
+
+    @staticmethod
+    def register_views(views):
+        raise Exception("not implemented")
+
 
 def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=None, request_widgets=None):
     """
@@ -138,7 +190,6 @@ def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=No
     global socket
     if socket is None:
         start()
-
     is_running = True
     qpainter = QPainter()
     while is_running:
@@ -146,9 +197,11 @@ def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=No
         if msg_type == "0":  # track
             frame, M = recv_mat()
             on_track(frame, M)
+            Signals.stop_listening()  # stop busy wait at server
         elif msg_type == "1":  # paint
             frame = recv_paint()
             M = on_paint(frame)
+            Signals.stop_listening()  # stop busy wait at server
             if M is None:
                 socket.send_string("N")
             else:  # send matrix back
@@ -156,12 +209,15 @@ def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=No
                 send_mat(M)
         elif msg_type == "2":  # shutdown
             on_shutdown()
+            Signals.stop_listening()
             is_running = False
         elif msg_type == "3":  # paintOverlay
             on_paintOverlay(qpainter)
+            Signals.stop_listening()
             socket.send_string(qpainter.to_msg())
             qpainter.content = ""
         elif msg_type == "4":  # request widgets
+            Signals.stop_listening()
             socket.send_string(widget_str)
         elif msg_type == "5":  # update widget
             events = socket.recv_string().split(',')
@@ -176,7 +232,7 @@ def run_client(on_track, on_paint, on_paintOverlay, on_shutdown, keep_running=No
                     raise Exception("Unknown event type " + event_type)
             else:
                 raise Exception("cannot find callback for widget id " + widget_id)
-            pass
+            Signals.stop_listening()
         else:
             raise Exception("could not determine type:" + msg_type)
 
