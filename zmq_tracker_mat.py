@@ -37,7 +37,8 @@ def request_widgets():
     print("request widgets btn")
     return [
         biotracker.Button("ClickMe", btn_click),
-        biotracker.Button("ClickMeToo", btn2_click)
+        biotracker.Button("ClickMeToo", btn2_click),
+	biotracker.Text("Funny text:")
     ]
 
 
