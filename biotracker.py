@@ -246,7 +246,10 @@ def send_mat(M):
     """
     w = str(M.shape[0])
     h = str(M.shape[1])
-    c = M.shape[2]
+    if len(M.shape) == 3:
+        c = M.shape[2]
+    else:
+        c = 1
     mtype = str(dtype_to_mtype(M.dtype, c))
     shape = w + "," + h + "," + mtype
     socket.send_string(shape, flags=zmq.SNDMORE)
