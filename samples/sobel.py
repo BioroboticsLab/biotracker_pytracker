@@ -4,7 +4,7 @@ from biotracker import (
     run_client
 )
 import numpy as np
-from scipy import signal, misc
+from scipy import signal, ndimage
 
 Mat = None
 Kx = np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
@@ -12,16 +12,12 @@ Ky = Kx.T
 show_x = True
 
 
-def rgb2gray(rgb):
-    return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
-
 def track(frame, M):
     global Mat, Kx, Ky, show_x
-    M = rgb2gray(M)
     if show_x:
-        Mat = signal.convolve2d(M, Kx, boundary='symm', mode='same')
+        Mat = ndimage.sobel(M, 0)
     else:
-        Mat = signal.convolve2d(M, Ky, boundary='symm', mode='same')
+        Mat = ndimage.sobel(M, 1)
 
 
 def paint(frame):
