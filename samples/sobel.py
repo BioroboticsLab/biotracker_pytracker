@@ -12,29 +12,12 @@ Ky = Kx.T
 show_x = True
 
 
-def average(px):
-    """
-    Helper for converting to grayscale
-    :return:
-    """
-    return 0.299 * px[0] + 0.587 * px[1] + 0.114 * px[2]
-
-def to_gray(M):
-    """
-    convert image to grayscale
-    :param M:
-    :return:
-    """
-    gray = np.zeros((M.shape[0], M.shape[1]))
-    for row in range(len(M)):
-        for col in range(len(M[row])):
-            gray[row][col] = average(M[row][col])
-    return gray
-
+def rgb2gray(rgb):
+    return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
 
 def track(frame, M):
     global Mat, Kx, Ky, show_x
-    M = to_gray(M)
+    M = rgb2gray(M)
     if show_x:
         Mat = signal.convolve2d(M, Kx, boundary='symm', mode='same')
     else:
