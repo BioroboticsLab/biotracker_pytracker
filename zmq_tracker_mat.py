@@ -16,16 +16,13 @@ def paint(frame):
     if Mat is not None:
         return Mat
 
-
 def paint_overlay(qpainter):
     print("paint overlay")
     qpainter.setPen(255, 255, 0, 255)
     qpainter.drawRect((20, 20, 60, 60))
 
-
 def shutdown():
     print("shutdown")
-
 
 def btn_click():
     print("button click")
