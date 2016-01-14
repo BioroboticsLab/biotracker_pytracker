@@ -106,7 +106,6 @@ MSG_TYPE_FILE_OPEN = "3"
 class Signals:
     """
     represents the signals that a Tracker can send to the BioTracker GUI
-    The signals are batched and send at the end of a call
     """
 
     @staticmethod
