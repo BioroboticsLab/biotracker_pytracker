@@ -103,6 +103,12 @@ MSG_TYPE_FAIL = "2"
 MSG_TYPE_FILE_OPEN = "3"
 
 
+class Helper:
+
+    @staticmethod
+    def rgb2gray(rgb):
+        return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
+
 class Signals:
     """
     represents the signals that a Tracker can send to the BioTracker GUI
@@ -244,8 +250,8 @@ def send_mat(M):
 
     :param M: numpy
     """
-    w = str(M.shape[0])
-    h = str(M.shape[1])
+    h = str(M.shape[0])
+    w = str(M.shape[1])
     if len(M.shape) == 3:
         c = M.shape[2]
     else:
@@ -272,8 +278,8 @@ def rec_str():
 def recv_mat():
     mat_dim = socket.recv_string()
     shape = mat_dim.split(",")
-    w = int(shape[0])
-    h = int(shape[1])
+    h = int(shape[0])
+    w = int(shape[1])
     mtype = int(shape[2])
     frame = int(shape[3])
     mat_data = socket.recv(copy=True, track=False)

@@ -1,28 +1,29 @@
 from biotracker import (
     Signals,
+    Helper,
     Button,
     run_client
 )
 import numpy as np
-from scipy import signal, ndimage
+from scipy import signal
 
 Mat = None
 Kx = np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
 Ky = Kx.T
 show_x = True
 
-
-def rgb2gray(rgb):
-    return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
-
-
 def track(frame, M):
     global Mat, Kx, Ky, show_x
-    M = rgb2gray(M)
+    M = Helper.rgb2gray(M)
+    direc = "y"
     if show_x:
-        Mat = ndimage.sobel(M, 0)
+        direc = "x"
+    Signals.notify_gui(
+        "frame:" + str(frame) + " M:" + str(M.shape) + " dir:" + direc)
+    if show_x:
+        Mat = signal.convolve2d(M, Kx, boundary='symm', mode='same')
     else:
-        Mat = ndimage.sobel(M, 1)
+        Mat = signal.convolve2d(M, Ky, boundary='symm', mode='same')
 
 
 def paint(frame):
@@ -41,7 +42,7 @@ def toggle_xy():
 
 def request_widgets():
     return [
-        Button("Toggle X/Y", toggle_xy())
+        Button("Toggle X/Y", toggle_xy)
     ]
 
 
