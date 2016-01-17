@@ -2,6 +2,7 @@ from biotracker import (
     Signals,
     Button,
     Text,
+    Slider,
     run_client)
 import numpy as np
 
@@ -38,11 +39,14 @@ def btn_click():
 def btn2_click():
     Signals.notify_gui("button2 click")
 
+def slider_changed(value):
+    Signals.notify_gui("slider changed " + str(value))
 
 def request_widgets():
     return [
         Button("ClickMe", btn_click),
         Button("ClickMeToo", btn2_click),
+        Slider("Slide me", 0, 100, 25, slider_changed),
         Text("Funny text:")]
 
 run_client(

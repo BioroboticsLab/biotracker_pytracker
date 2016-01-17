@@ -96,6 +96,13 @@ class Slider(Widget):
         self.min = minv
         self.max = maxv
         self.default = default
+    
+    def to_msg(self):
+        return "s(" + str(self.id) + "," +\
+            str(self.text) + "," +\
+            str(self.min) + "," +\
+            str(self.max) + "," +\
+            str(self.default) + ")"
 
 MSG_TYPE_NOTIFICATION = "0"
 MSG_TYPE_WARNING = "1"
